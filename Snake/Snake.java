@@ -12,9 +12,10 @@ import java.util.Random;
 public class Snake implements ActionListener, KeyListener{
     Draw _draw;
     public LinkedList<GameElement> snakeBody = new LinkedList<GameElement>();
+    LinkedList<Point> _bodyPosition = new LinkedList<Point>();
     GameElement _head = new GameElement(Color.BLACK);
-    GameElement _bodyPart = new GameElement(Color.RED);
-    GameElement _food = new GameElement(Color.ORANGE);
+    GameElement _bodyPart = new GameElement(Color.BLUE);
+    GameElement _food = new GameElement(Color.RED);
     JFrame _frame = new JFrame("Snake");
     Timer _timer = new Timer(20, this);
     Random _random;
@@ -50,12 +51,11 @@ public class Snake implements ActionListener, KeyListener{
         _frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         _frame.addKeyListener(this);
 
-        _fWidth = _frame.getBounds().width / 10;
-        _fHeight = _frame.getBounds().height / 10;
+        _fWidth = (_frame.getBounds().width) / 10;
+        _fHeight = (_frame.getBounds().height) / 10;
 
-        _head.create(0, 0);
+        _head.create(0, -1);
         _food.create(_random.nextInt(_fWidth), _random.nextInt(_fHeight));
-        System.out.println(_food.getPosition());
 
         snakeBody.add(_head);
 
@@ -66,63 +66,96 @@ public class Snake implements ActionListener, KeyListener{
 
     
     public void Move(int pDirection){
-        if (collision()) {
-            System.out.println("ATE FOOD");
-            /*
-            _bodyPart.create(_head._position.x, _head._position.y);
-            snakeBody.add(_bodyPart);
-
-            _food.create(_random.nextInt(_fWidth), _random.nextInt(_fHeight));
-*/
-            _snakeLength++;
-            System.out.println(_snakeLength + " " + snakeBody.size());
-        }
-        
-        if (snakeBody.size() > _snakeLength - 1) {
-            snakeBody.removeLast();
-        }
-
         _draw.repaint();
+        _bodyPosition.clear();
+
         _millis++;
 
         // defines the movementspeed of the snake as does the timer
         // the frame updates every 2 milliseconds
         if (_millis % 2 == 0 && _head != null) {
-            snakeBody.add(_head);
-            System.out.println(_head.getPosition());
-
+            GameElement g;
             if (_direction == 0) {
                 // DOWN
-                updatePosition(1, 'y');
+                g = snakeBody.get(0);
+                g._position.y += 1;
+
+                updateSnake();
+
                 // If the snakes exits the window border
                 if (_head._position.y >= _fHeight) {
-                    _head._position.y = 0;   
+                    _head._position.y = 0;
                 }
 
-            }else if (_direction == 1) {
+            } else if (_direction == 1) {
                 // RIGHT
-                updatePosition(1, 'x');
-                
+                g = snakeBody.get(0);
+                g._position.x += 1;
+                updateSnake();
+
                 if (_head._position.x >= _fWidth) {
-                    _head._position.x = 0;                    
+                    _head._position.x = 0;
                 }
-            }else if (_direction == 2){
+            } else if (_direction == 2) {
                 // UP
-                updatePosition(-1, 'y');
-                
+                g = snakeBody.get(0);
+                g._position.y -= 1;
+                updateSnake();
+
                 if (_head._position.y <= 0) {
-                    _head._position.y = 0;                    
+
+                    _head._position.y = 0;
                 }
 
-            }else if (_direction == 3){
+            } else if (_direction == 3) {
                 // LEFT
-                updatePosition(-1, 'x');
-                
+                g = snakeBody.get(0);
+                g._position.x -= 1;
+                updateSnake();
+
                 if (_head._position.x <= 0) {
-                    _head._position.x = 0;                    
+                    _head._position.x = 0;
                 }
             }
             _head._position = CreatePosition(_head._position.x, _head._position.y);
+            snakeBody.remove(0);
+            snakeBody.addFirst(_head);
+            System.out.println("Position: " + _bodyPosition + "\n");
+            for (int i = 0; i < snakeBody.size(); i++) {
+                System.out.println("Snake: " + snakeBody.getLast()._position);
+            }
+
+            if (collision()) {
+                System.out.println("ATE FOOD");
+
+                _bodyPart = new GameElement(Color.BLUE);
+
+                GameElement last = snakeBody.getLast();
+                _bodyPart._position = _bodyPart.create(last._position.x, last._position.y);
+
+                snakeBody.addLast(_bodyPart);
+
+                _food.create(_random.nextInt(_fWidth), _random.nextInt(_fHeight));
+                _snakeLength++;
+            }
+
+            if (snakeBody.size() > _snakeLength) {
+                //snakeBody.removeLast();
+            }
+        }
+    }
+
+    private void updateSnake() {
+        GameElement g;
+        for (GameElement bodyPart : snakeBody) {
+            _bodyPosition.add(bodyPart._position);
+        }
+
+        for (int i = 0; i < snakeBody.size(); i++) {
+            if (i != 0) {
+                g = snakeBody.get(i);
+                g._position = _bodyPosition.get(i - 1);
+            }
         }
     }
 
@@ -130,20 +163,7 @@ public class Snake implements ActionListener, KeyListener{
         if (_head.getPosition().equals(_food.getPosition())) {
             return true;
         }
-
         return false;
-    }
-
-    // 1 or -1 && x or y
-    public void updatePosition(int pAmount, char pC){
-        for (GameElement body : snakeBody) {
-            if (pC == 'x') {
-                body._position.x += pAmount;
-            }
-            else{
-                body._position.y += pAmount;
-            }
-        }
     }
 
     public Point CreatePosition(int pX, int pY){
@@ -162,19 +182,19 @@ public class Snake implements ActionListener, KeyListener{
     public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
 
-        if (keyCode == KeyEvent.VK_LEFT && _direction != 3)
+        if (keyCode == KeyEvent.VK_LEFT && _direction != 1)
 		{
 			_direction = 3;
 		}
-		else if (keyCode == KeyEvent.VK_RIGHT && _direction != 1)
+		else if (keyCode == KeyEvent.VK_RIGHT && _direction != 3)
 		{
 			_direction = 1;
 		}
-		else if (keyCode == KeyEvent.VK_UP && _direction != 2)
+		else if (keyCode == KeyEvent.VK_UP && _direction != 0)
 		{
             _direction = 2;
         }
-		else if (keyCode == KeyEvent.VK_DOWN && _direction != 0)
+		else if (keyCode == KeyEvent.VK_DOWN && _direction != 2)
 		{
             _direction = 0;
         }

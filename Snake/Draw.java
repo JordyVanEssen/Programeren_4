@@ -14,16 +14,16 @@ public class Draw extends JPanel{
         super.paintComponent(g);
         Snake _snake = Program._snake;
 
-        g.setColor(Color.lightGray);
+
+        g.setColor(Color.GREEN);
 		g.fillRect(0, 0, 800, 700);
 
-        g.setColor(Color.ORANGE);
+        g.setColor(_snake._food._partColor);
         g.fillRect(_snake._food._position.x * _snake._scale, _snake._food._position.y * _snake._scale, _snake._scale, _snake._scale);
-        
-        _snake.snakeBody.forEach(bodyPart -> {
+
+        for (GameElement bodyPart : _snake.snakeBody) {
             g.setColor(bodyPart._partColor);
             g.fillRect(bodyPart._position.x * _snake._scale, bodyPart._position.y * _snake._scale, _snake._scale, _snake._scale);
-        });
-
+        }
     }
 }

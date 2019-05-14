@@ -1,7 +1,7 @@
 import java.awt.Color;
 import java.awt.Point;
 
-// Game element, Head, Body and the food
+// Game element, Head, Body and Food
 public class GameElement extends Point{
     Color _partColor;
     Point _position;
