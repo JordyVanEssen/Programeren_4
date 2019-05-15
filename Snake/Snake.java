@@ -10,20 +10,18 @@ import javax.swing.Timer;
 import java.util.Random;
 
 public class Snake implements ActionListener, KeyListener{
-    Draw _draw;
-    public LinkedList<GameElement> snakeBody = new LinkedList<GameElement>();
-    LinkedList<Point> _bodyPosition = new LinkedList<Point>();
     GameElement _head = new GameElement(Color.BLACK);
     GameElement _bodyPart = new GameElement(Color.BLUE);
     GameElement _food = new GameElement(Color.RED);
     JFrame _frame = new JFrame("Snake");
     Timer _timer = new Timer(20, this);
     Random _random;
+    Draw _draw;
 
+    // Lists to keep track of the body and positions
+    public LinkedList<GameElement> snakeBody = new LinkedList<GameElement>();
+    LinkedList<Point> _bodyPosition = new LinkedList<Point>();
 
-    //length of the snake, default 1 => head
-    private int _snakeLength = 1;
-    
     //counter, movementspeed of the snake
     private int _millis = 0;
 
@@ -54,12 +52,11 @@ public class Snake implements ActionListener, KeyListener{
         _fWidth = (_frame.getBounds().width) / 10;
         _fHeight = (_frame.getBounds().height) / 10;
 
-        _head.create(0, -1);
-        _food.create(_random.nextInt(_fWidth), _random.nextInt(_fHeight));
+        _head.create(1, 1);
+        _food.create(_random.nextInt(_fWidth - 1), _random.nextInt(_fHeight - 1));
 
         snakeBody.add(_head);
 
-        _snakeLength++;
         _millis = 0;
         _timer.start();
     }
@@ -77,57 +74,22 @@ public class Snake implements ActionListener, KeyListener{
             GameElement g;
             if (_direction == 0) {
                 // DOWN
-                g = snakeBody.get(0);
-                g._position.y += 1;
-
-                updateSnake();
-
-                // If the snakes exits the window border
-                if (_head._position.y >= _fHeight) {
-                    _head._position.y = 0;
-                }
+                updateHead(0, 1);
 
             } else if (_direction == 1) {
                 // RIGHT
-                g = snakeBody.get(0);
-                g._position.x += 1;
-                updateSnake();
+                updateHead(1, 0);
 
-                if (_head._position.x >= _fWidth) {
-                    _head._position.x = 0;
-                }
             } else if (_direction == 2) {
                 // UP
-                g = snakeBody.get(0);
-                g._position.y -= 1;
-                updateSnake();
-
-                if (_head._position.y <= 0) {
-
-                    _head._position.y = 0;
-                }
+                updateHead(0, -1);
 
             } else if (_direction == 3) {
                 // LEFT
-                g = snakeBody.get(0);
-                g._position.x -= 1;
-                updateSnake();
-
-                if (_head._position.x <= 0) {
-                    _head._position.x = 0;
-                }
-            }
-            _head._position = CreatePosition(_head._position.x, _head._position.y);
-            snakeBody.remove(0);
-            snakeBody.addFirst(_head);
-            System.out.println("Position: " + _bodyPosition + "\n");
-            for (int i = 0; i < snakeBody.size(); i++) {
-                System.out.println("Snake: " + snakeBody.getLast()._position);
+                updateHead(-1, 0);
             }
 
-            if (collision()) {
-                System.out.println("ATE FOOD");
-
+            if (collision(5, 5)) {
                 _bodyPart = new GameElement(Color.BLUE);
 
                 GameElement last = snakeBody.getLast();
@@ -135,33 +97,53 @@ public class Snake implements ActionListener, KeyListener{
 
                 snakeBody.addLast(_bodyPart);
 
-                _food.create(_random.nextInt(_fWidth), _random.nextInt(_fHeight));
-                _snakeLength++;
-            }
-
-            if (snakeBody.size() > _snakeLength) {
-                //snakeBody.removeLast();
+                _food.create(_random.nextInt(_fWidth - 10), _random.nextInt(_fHeight - 10));
             }
         }
     }
 
-    private void updateSnake() {
+    private void updateHead(int pX, int pY){
+        if (!collision(_head._position.x + pX, _head._position.y + pY)) {
+            if (_head._position.x <= 0 
+                    || _head._position.y <= 0 
+                        || _head._position.x >= _fWidth 
+                            || _head._position.y >= _fHeight) {
+
+                                //System.out.println("Out of Frame");
+            }
+            else{
+                _head._position = CreatePosition(_head._position.x + pX, _head._position.y + pY);
+                updateSnake(pX, pY);
+            }
+        }
+    }
+
+    private void updateSnake(int pX, int pY) {
         GameElement g;
         for (GameElement bodyPart : snakeBody) {
             _bodyPosition.add(bodyPart._position);
         }
 
         for (int i = 0; i < snakeBody.size(); i++) {
-            if (i != 0) {
+            if (i > 0) {
                 g = snakeBody.get(i);
                 g._position = _bodyPosition.get(i - 1);
+                if (g._position.equals(_head._position) && i == 1) {
+                    g._position = _bodyPart.create(_head._position.x - pX, _head._position.y - pY);
+                }
             }
         }
     }
 
-    public boolean collision(){
+    public boolean collision(int pX, int pY){
         if (_head.getPosition().equals(_food.getPosition())) {
             return true;
+        }
+        
+        for (GameElement bodyPart : snakeBody) {
+            if (bodyPart.getPosition().equals(new Point(_head.x + pX, _head.y + pY))) {
+                return true;
+            }
         }
         return false;
     }
@@ -196,6 +178,10 @@ public class Snake implements ActionListener, KeyListener{
         }
 		else if (keyCode == KeyEvent.VK_DOWN && _direction != 2)
 		{
+            _direction = 0;
+        }
+        else if (keyCode == KeyEvent.VK_SPACE) {
+            _head.create(1, 1);
             _direction = 0;
         }
     }
