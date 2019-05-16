@@ -13,14 +13,27 @@ public class Draw extends JPanel{
 
 
         g.setColor(Color.GREEN);
-		g.fillRect(0, 0, 800, 700);
+		g.fillRect(0, 0, 700, 700);
 
         g.setColor(_snake._food._partColor);
         g.fillRect(_snake._food._position.x * _snake._scale, _snake._food._position.y * _snake._scale, _snake._scale, _snake._scale);
 
-        for (GameElement bodyPart : _snake.snakeBody) {
+        for (GameElement bodyPart : _snake._snakeBody) {
             g.setColor(bodyPart._partColor);
             g.fillRect(bodyPart._position.x * _snake._scale, bodyPart._position.y * _snake._scale, _snake._scale, _snake._scale);
+        }
+
+        String text = "Score: " + _snake._score;
+		
+		g.setColor(Color.black);
+		
+        g.drawString(text, (int) (getWidth() / 2 - text.length() * 2.5f), 20);
+        
+        if (_snake._dead) {
+            text = "GAME OVER";
+            g.drawString(text, (int) (getWidth() / 2 - text.length() * 2.5f), (int) (getHeight() / 2 - text.length() * 2.5f));
+            text = "press space to restart";
+            g.drawString(text, (int) (getWidth() / 2 - text.length() * 2.5f), (int) ((getHeight() + 2) / 2 - text.length() * 2.5f));
         }
     }
 }
