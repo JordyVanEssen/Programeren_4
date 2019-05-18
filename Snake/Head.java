@@ -1,10 +1,10 @@
 import java.awt.Color;
 import java.awt.Point;
 
-public class Head extends GameElement{
+public class Head extends Bodypart{
 
-    public Head(){
-        super(Color.black);
+    public Head(Bodypart pNext){
+        super(Color.black, pNext);
     }
 
     @Override

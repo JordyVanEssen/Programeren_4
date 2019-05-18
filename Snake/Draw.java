@@ -5,12 +5,12 @@ import javax.swing.JPanel;
 
 
 public class Draw extends JPanel{
-
+    int counter = 0;
+    
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Snake _snake = Program._snake;
-
 
         g.setColor(Color.GREEN);
 		g.fillRect(0, 0, 700, 700);
@@ -18,9 +18,22 @@ public class Draw extends JPanel{
         g.setColor(_snake._food._partColor);
         g.fillRect(_snake._food._position.x * _snake._scale, _snake._food._position.y * _snake._scale, _snake._scale, _snake._scale);
 
-        for (GameElement bodyPart : _snake._snakeBody) {
-            g.setColor(bodyPart._partColor);
-            g.fillRect(bodyPart._position.x * _snake._scale, bodyPart._position.y * _snake._scale, _snake._scale, _snake._scale);
+        Bodypart currentPart = _snake._head;
+        g.fillRect(currentPart._position.x * _snake._scale, currentPart._position.y * _snake._scale, _snake._scale, _snake._scale);
+
+        while (true) {
+            //_snake._head.print(_snake._head);
+            if (currentPart != null) {
+                g.setColor(currentPart._partColor);
+                g.fillRect(currentPart._position.x * _snake._scale, currentPart._position.y * _snake._scale, _snake._scale, _snake._scale);
+            }
+
+            if (currentPart._next != null) {
+                currentPart = _snake._head.getPart(currentPart._next);
+            }
+            else{
+                break;
+            }
         }
 
         String text = "Score: " + _snake._score;

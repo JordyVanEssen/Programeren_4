@@ -5,6 +5,7 @@ import java.awt.Point;
 public class GameElement extends Point{
     Color _partColor;
     Point _position;
+
     public GameElement(Color pColor){
         this._partColor = pColor;
     }
@@ -20,4 +21,6 @@ public class GameElement extends Point{
     public Point getPosition() {
         return _position;
     }
+
+    
 }

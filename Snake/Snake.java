@@ -10,13 +10,12 @@ import javax.swing.Timer;
 import java.util.Random;
 
 public class Snake implements ActionListener, KeyListener{
-    GameElement _head = new GameElement(Color.black);
-    GameElement _bodyPart = new GameElement(Color.CYAN);
+    Bodypart _bodyPart;
+    Bodypart _head = new Head(null);
     GameElement _food = new GameElement(Color.RED);
     JFrame _frame = new JFrame("Snake");
 
-    int _speed = 50;
-    Timer _timer = new Timer(_speed, this);
+    Timer _timer = new Timer(50, this);
     Random _random;
     Draw _draw;
 
@@ -42,8 +41,10 @@ public class Snake implements ActionListener, KeyListener{
 
     public boolean _dead = false;
     private boolean _move = true;
+    private boolean _addPart = false;
 
     public Snake(){
+        System.out.println(_food);
         _random = new Random();
         _draw = new Draw();
 
@@ -65,8 +66,9 @@ public class Snake implements ActionListener, KeyListener{
         _head.create(_fWidth / 2, _fHeight / 2 - 20);
         _food.create(_random.nextInt(_fWidth - 10), _random.nextInt(_fHeight - 10));
         _snakeBody.clear();
-        _snakeBody.add(_head);
+        //_snakeBody.add(_head);
 
+        _head.delete(_head);
         _dead = false;
         _score = 0;
         _move = true;
@@ -97,22 +99,17 @@ public class Snake implements ActionListener, KeyListener{
                 updateHead(-1, 0);
             }
 
-            if (collision(_food._position.x, _food._position.y, false)) {
-                _bodyPart = new GameElement(Color.BLUE);
-
-                GameElement last = _snakeBody.getLast();
-                _bodyPart._position = _bodyPart.create(last._position.x, last._position.y);
+            if (collision(true)) {
                 _score++;
-                _snakeBody.addLast(_bodyPart);
-
                 _food.create(_random.nextInt(_fWidth - 10), _random.nextInt(_fHeight - 10));
+                _addPart = true;
             }
         }
         
     }
 
     private void updateHead(int pX, int pY){
-        if (!collision(_head._position.x + pX, _head._position.y + pY, true)) {
+        if (!collision(false)) {
             if (_head._position.x < 0 
                     || _head._position.y < 0 
                         || _head._position.x > _fWidth 
@@ -122,6 +119,10 @@ public class Snake implements ActionListener, KeyListener{
                             }
                             else{
                                 _head._position = CreatePosition(_head._position.x + pX, _head._position.y + pY);
+                                if (_addPart) {
+                                    _head.addBodyPart(_head, pX, pY);
+                                    _addPart = false;
+                                }
                                 updateSnake(pX, pY);
                                 _move = true;
                             }
@@ -129,35 +130,18 @@ public class Snake implements ActionListener, KeyListener{
     }
 
     private void updateSnake(int pX, int pY) {
-        GameElement g;
-        for (GameElement bodyPart : _snakeBody) {
-            _bodyPosition.add(bodyPart._position);
-        }
-
-        for (int i = 0; i < _snakeBody.size(); i++) {
-            if (i > 0) {
-                g = _snakeBody.get(i);
-                g._position = _bodyPosition.get(i - 1);
-                if (g._position.equals(_head._position) && i == 1) {
-                    g._position = _bodyPart.create(_head._position.x - pX, _head._position.y - pY);
-                }
-            }
-        }
+        _head.update(_head, pX, pY);
+        _head._endReached = false;
     }
 
-    public boolean collision(int pX, int pY, boolean pB){
-        if (_head.getPosition().equals(_food.getPosition())) {
-            return true;
-        }
-        
-        for (GameElement bodyPart : _snakeBody) {
-            if (pB && bodyPart.getPosition().equals(new Point(_head._position.x + pX, _head._position.y + pY))) {
-                _dead = true;
-                System.out.println("Collision with body");
+    public boolean collision(boolean p){
+        if (p) {
+            if (_head._position.equals(_food._position)) {
                 return true;
-            }
+            }    
         }
         return false;
+        //return _head.collision(_head);
     }
 
     public Point CreatePosition(int pX, int pY){
