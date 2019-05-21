@@ -22,7 +22,6 @@ public class Draw extends JPanel{
         g.fillRect(currentPart._position.x * _snake._scale, currentPart._position.y * _snake._scale, _snake._scale, _snake._scale);
 
         while (true) {
-            //_snake._head.print(_snake._head);
             if (currentPart != null) {
                 g.setColor(currentPart._partColor);
                 g.fillRect(currentPart._position.x * _snake._scale, currentPart._position.y * _snake._scale, _snake._scale, _snake._scale);

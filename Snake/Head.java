@@ -11,9 +11,4 @@ public class Head extends Bodypart{
     public Point create(int pX, int pY) {
         return super.create(pX, pY);
     }
-
-    @Override
-    public Point getPosition() {
-        return super.getPosition();
-    }
 }

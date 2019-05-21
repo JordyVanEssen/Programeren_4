@@ -28,19 +28,24 @@ public class Bodypart extends GameElement{
         return null;
     }
 
-    public Boolean collision(Bodypart pBodypart){
-        Point head = new Point();
-        if (pBodypart._next != null) {
-            if (pBodypart._prev == null) {
-                head = pBodypart._position;
+    public Boolean collision(Bodypart pBodypart, int pX, int pY){
+        Snake snake = Program._snake;
+        GameElement head = snake._head;
+        boolean collided = false;
+        if (pBodypart != null) {
+            if (pBodypart._position.equals(new Point(head._position.x + pX, head._position.y + pY))) {
+                System.out.println("Collision");
+                collided = true;
+                snake._dead  = true;
+                return collided;
+            }    
+            else{
+                if (pBodypart._next != null && !collided) {
+                    collision(pBodypart._next, pX, pY);
+                }
             }
-
-            if (head.equals(pBodypart._next._position)) {
-                return true;
-            }
-            collision(pBodypart._next);
         }
-        return false;
+        return collided;
     }
 
     public void update(Bodypart pBodypart, int pX, int pY){
@@ -82,15 +87,15 @@ public class Bodypart extends GameElement{
             pBodypart._next = null;
         }
     }
+    
+    @Override
+    public Point create(Bodypart pBodypart) {
+        return null;
+    }
 
     @Override
     public Point create(int pX, int pY) {
         return super.create(pX, pY);
-    }
-
-    @Override
-    public Point getPosition() {
-        return super.getPosition();
     }
 
     /**

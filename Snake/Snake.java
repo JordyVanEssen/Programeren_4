@@ -12,16 +12,12 @@ import java.util.Random;
 public class Snake implements ActionListener, KeyListener{
     Bodypart _bodyPart;
     Bodypart _head = new Head(null);
-    GameElement _food = new GameElement(Color.RED);
+    GameElement _food = new Food();
     JFrame _frame = new JFrame("Snake");
 
     Timer _timer = new Timer(50, this);
     Random _random;
     Draw _draw;
-
-    // Lists to keep track of the body and positions
-    public LinkedList<GameElement> _snakeBody = new LinkedList<GameElement>();
-    LinkedList<Point> _bodyPosition = new LinkedList<Point>();
 
     //the height and width of the frame
     int _fWidth;
@@ -64,11 +60,9 @@ public class Snake implements ActionListener, KeyListener{
 
     public void startGame(){
         _head.create(_fWidth / 2, _fHeight / 2 - 20);
-        _food.create(_random.nextInt(_fWidth - 10), _random.nextInt(_fHeight - 10));
-        _snakeBody.clear();
-        //_snakeBody.add(_head);
-
+        _food._position = _food.create(_head);
         _head.delete(_head);
+
         _dead = false;
         _score = 0;
         _move = true;
@@ -79,7 +73,6 @@ public class Snake implements ActionListener, KeyListener{
     
     public void Move(int pDirection){
         _draw.repaint();
-        _bodyPosition.clear();
 
         if (!_dead) {
             if (_direction == 0) {
@@ -99,17 +92,16 @@ public class Snake implements ActionListener, KeyListener{
                 updateHead(-1, 0);
             }
 
-            if (collision(true)) {
+            if (ateFood()) {
                 _score++;
                 _food.create(_random.nextInt(_fWidth - 10), _random.nextInt(_fHeight - 10));
                 _addPart = true;
             }
         }
-        
     }
 
     private void updateHead(int pX, int pY){
-        if (!collision(false)) {
+        if (!_head.collision(_head, pX, pY)) {
             if (_head._position.x < 0 
                     || _head._position.y < 0 
                         || _head._position.x > _fWidth 
@@ -127,6 +119,10 @@ public class Snake implements ActionListener, KeyListener{
                                 _move = true;
                             }
         }
+        else{
+            _dead = true;
+            System.out.println(_dead);
+        }
     }
 
     private void updateSnake(int pX, int pY) {
@@ -134,14 +130,11 @@ public class Snake implements ActionListener, KeyListener{
         _head._endReached = false;
     }
 
-    public boolean collision(boolean p){
-        if (p) {
-            if (_head._position.equals(_food._position)) {
-                return true;
-            }    
-        }
+    public boolean ateFood(){
+        if (_head._position.equals(_food._position)) {
+            return true;
+        }    
         return false;
-        //return _head.collision(_head);
     }
 
     public Point CreatePosition(int pX, int pY){
