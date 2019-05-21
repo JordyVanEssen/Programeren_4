@@ -14,6 +14,7 @@ public class Bodypart extends GameElement{
         }
     }
 
+    // prints all the body parts, for debug purposes
     public void print(Bodypart pBodypart){
         if (pBodypart != null) {
             System.out.println("Positions: " + pBodypart._position);
@@ -21,6 +22,8 @@ public class Bodypart extends GameElement{
         }
     }
 
+    // returns a part
+    // this function is used in the draw class
     public Bodypart getPart(Bodypart pBodypart){
         if (pBodypart != null) {
             return pBodypart;
@@ -28,26 +31,27 @@ public class Bodypart extends GameElement{
         return null;
     }
 
+    // checks if the snake collides with itself
     public Boolean collision(Bodypart pBodypart, int pX, int pY){
         Snake snake = Program._snake;
         GameElement head = snake._head;
-        boolean collided = false;
+
         if (pBodypart != null) {
             if (pBodypart._position.equals(new Point(head._position.x + pX, head._position.y + pY))) {
-                System.out.println("Collision");
-                collided = true;
                 snake._dead  = true;
-                return collided;
+                return true;
             }    
             else{
-                if (pBodypart._next != null && !collided) {
+                if (pBodypart._next != null) {
                     collision(pBodypart._next, pX, pY);
                 }
             }
         }
-        return collided;
+        return false;
     }
 
+
+    // updates every parts position 
     public void update(Bodypart pBodypart, int pX, int pY){
         Snake snake = Program._snake;
         if (pBodypart._next != null && !_endReached) {
@@ -69,6 +73,7 @@ public class Bodypart extends GameElement{
         }
     }
 
+    // adds a new bodypart at the end of the snake
     public void addBodyPart(Bodypart pBodypart, int pX, int pY){
         if (pBodypart._next == null) {
 
@@ -82,6 +87,7 @@ public class Bodypart extends GameElement{
         }
     }
 
+    // deletes the whole snake except the head
     public void delete(Bodypart pBodypart){
         if (pBodypart._next != null) {
             pBodypart._next = null;
