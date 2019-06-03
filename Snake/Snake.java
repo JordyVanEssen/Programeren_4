@@ -102,7 +102,7 @@ public class Snake implements ActionListener, KeyListener{
             // detects if the head of the snake collided with the food
             if (ateFood()) {
                 _score++;
-                _food.create(_random.nextInt(_fWidth - 10), _random.nextInt(_fHeight - 10));
+                _food._position = _food.create(_head);
                 _addPart = true;
             }
         }

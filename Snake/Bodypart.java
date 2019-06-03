@@ -4,6 +4,7 @@ import java.awt.Point;
 public class Bodypart extends GameElement{
     Bodypart _next, _prev = null;
     boolean _endReached = false;
+    int _score = 0;
 
     public Bodypart(Color pColor, Bodypart pNext){
         super(pColor);
@@ -93,11 +94,16 @@ public class Bodypart extends GameElement{
             pBodypart._next = null;
         }
     }
+
+    // counts all the parts in the snake
+    public void calculateScore(Bodypart pBodypart){
+        
+    }
     
     @Override
     public Point create(Bodypart pBodypart) {
         return null;
-    }
+    } 
 
     @Override
     public Point create(int pX, int pY) {

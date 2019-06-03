@@ -11,7 +11,7 @@ public class Food extends GameElement {
 
     @Override
     public Point create(Bodypart pBodypart) {
-        _position = new Point(_random.nextInt(50), _random.nextInt(50));
+        _position = new Point(_random.nextInt(60) + 10, _random.nextInt(60) + 10);
 
         // checks if the new position is on top of the snake
         if (pBodypart._position.equals(this._position)) {
