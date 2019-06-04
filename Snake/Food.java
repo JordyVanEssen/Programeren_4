@@ -11,13 +11,15 @@ public class Food extends GameElement {
 
     @Override
     public Point create(Bodypart pBodypart) {
-        _position = new Point(_random.nextInt(60) + 10, _random.nextInt(60) + 10);
+        _position = new Point(_random.nextInt(50) + 10, _random.nextInt(50) + 10);
 
         // checks if the new position is on top of the snake
         if (pBodypart._position.equals(this._position)) {
-            if (pBodypart._next != null) {
-                create(pBodypart._next);
-            }
+            return new Point(_random.nextInt(50) + 10, _random.nextInt(50) + 10);
+        }
+
+        if (pBodypart._next != null) {
+            create(pBodypart._next);
         }
         return _position;
     }

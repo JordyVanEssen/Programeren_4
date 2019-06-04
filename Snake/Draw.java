@@ -11,7 +11,7 @@ public class Draw extends JPanel{
         super.paintComponent(g);
         Snake _snake = Program._snake;
 
-        // draws a recangle on screen as representation of a part of the snake
+        // draws a rectangle on screen as representation of the food
         g.setColor(_snake._food._partColor);
         g.fillRect(_snake._food._position.x * _snake._scale, _snake._food._position.y * _snake._scale, _snake._scale, _snake._scale);
 

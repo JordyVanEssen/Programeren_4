@@ -16,7 +16,7 @@ public class Snake implements ActionListener, KeyListener{
     JFrame _frame = new JFrame("Snake");
 
     // the timer
-    Timer _timer = new Timer(50, this);
+    Timer _timer = new Timer(80, this);
     Random _random;
     Draw _draw;
 
@@ -34,7 +34,7 @@ public class Snake implements ActionListener, KeyListener{
     private int _direction = 0;
 
     //scale of the snake
-    public int _scale = 10;
+    public int _scale = 15;
 
     public boolean _dead = false;
     private boolean _move = true;
@@ -46,17 +46,17 @@ public class Snake implements ActionListener, KeyListener{
 
         // creates the frame
         _frame.setContentPane(_draw);
-        _frame.setSize(700, 700);
+        _frame.setSize(710, 720);
         _frame.setLocationRelativeTo(null);
         _frame.setVisible(true);
         _frame.setResizable(false);
-        _frame.setBackground(Color.green);
+        _frame.getContentPane().setBackground(Color.green);
         _frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         _frame.addKeyListener(this);
 
         // saves the height en width of the frame for further use.
-        _fWidth = (_frame.getBounds().width) / 10;
-        _fHeight = (_frame.getBounds().height) / 10;
+        _fWidth = (_frame.getBounds().width) / _scale;
+        _fHeight = (_frame.getBounds().height) / _scale;
 
         // function to start the game
        startGame();
@@ -65,8 +65,10 @@ public class Snake implements ActionListener, KeyListener{
     public void startGame(){
         // sets all the variables to default
         _head.create(_fWidth / 2, _fHeight / 2 - 20);
-        _food._position = _food.create(_head);
+        _food._position = _food.create(_random.nextInt(_fWidth - _scale), _random.nextInt(_fHeight - _scale));
         _head.delete(_head);
+        _head.addBodyPart(_head, _head._position.x, _head._position.y);
+        
 
         _dead = false;
         _score = 0;
@@ -102,7 +104,7 @@ public class Snake implements ActionListener, KeyListener{
             // detects if the head of the snake collided with the food
             if (ateFood()) {
                 _score++;
-                _food._position = _food.create(_head);
+                _food._position = _food.create(_random.nextInt(_fWidth - _scale), _random.nextInt(_fHeight - _scale));
                 _addPart = true;
             }
         }
