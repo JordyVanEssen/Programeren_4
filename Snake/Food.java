@@ -21,6 +21,7 @@ public class Food extends GameElement {
         if (pBodypart._next != null) {
             create(pBodypart._next);
         }
+
         return _position;
     }
 }
