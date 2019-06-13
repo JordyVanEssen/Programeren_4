@@ -1,26 +1,33 @@
-import java.util.ArrayList;;
+import java.util.ArrayList;
 
 public class Dock{
     ArrayList<Container> containers = new ArrayList<Container>();
-    int max = 5;
+    int space = 5;
 
     public Dock(){
         
     }
 
     public boolean storeContainer(Container pContainer){
-        if (max > 0) {
-            max--;
+        if (space > 0) {
+            space--;
             containers.add(pContainer);
+            System.out.println("DOCK: Container opgeslagen: " + pContainer.volgNummer);
+            System.out.println("DOCK: Plaatsen beschikbaar: " + space);
+
             return true;
         }
         return false;
     }
 
     public Container releaseContainer(){
-        if (containers.get(containers.size() - 1) != null) {
-            max++;
-            return containers.get(containers.size() - 1);
+        Container container = containers.get(containers.size() - 1);
+        if (container != null) {
+            space++;
+            containers.remove(container);
+            System.out.println("DOCK: Container vrijgegeven: " + container.volgNummer);
+
+            return container;
         }
         return null;
     }

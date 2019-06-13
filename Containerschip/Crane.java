@@ -8,21 +8,19 @@ public class Crane extends Thread{
 
     public Crane(String pNaam){
         this.naam = pNaam;
+        ship = Main.ship;
+        dock = Main.dock;
     }
 
     @Override
     public void run() {
-        getContainer();
-    }
-
-    public void getContainer(){
-        Container container = ship.removeContainer();
-
-        if (container == null) {
+        while (true) {
             getContainer();
         }
+    }
 
-        System.out.println(this.naam + " Got container: " + container.volgNummer);
+    public synchronized void getContainer(){
+        System.out.println(this.naam.toUpperCase() + ": Wil container halen.");
 
         try {
             Thread.sleep(random.nextInt(5000) + 1000);
@@ -30,16 +28,22 @@ public class Crane extends Thread{
             e.printStackTrace();
         }
 
+        Container container = ship.removeContainer();
+
+        if (container == null) {
+            getContainer();
+        }
+
+        System.out.println(this.naam.toUpperCase() + ": Kreeg container: " + container.volgNummer);
+        
         container.reserved = false;
         dumpContainer(container);
     }
 
-    public void dumpContainer(Container pContainer){
+    public synchronized void dumpContainer(Container pContainer){
         boolean stored = false;
         while (!stored) {
             stored = dock.storeContainer(pContainer);
         }
-
-        System.out.println("Container " + pContainer.volgNummer + " stored on the dock.");
     }
 }

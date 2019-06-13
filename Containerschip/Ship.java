@@ -1,4 +1,7 @@
-import java.util.ArrayList;;
+import java.util.ArrayList;
+import java.util.concurrent.Semaphore;
+import java.lang.Thread;
+
 
 public class Ship{
     ArrayList<Container> containers = new ArrayList<Container>();
@@ -6,9 +9,7 @@ public class Ship{
     // the contstructor of the ship class
     // the ship is filled with containers
     public Ship(){
-        if (this.containers.size() < 0) {
-            this.fillShip(100);
-        }
+       
     }
 
     public void fillShip(int pAmount){
@@ -17,21 +18,25 @@ public class Ship{
         }
 
         System.out.println(containers.size());
-        System.out.println("A ship has arrived at the docks with "+ pAmount + " containers.");
+        System.out.println("Er is een schip gearriveerd met "+ pAmount + " containers.");
     }
 
     // this function is used to unload the ship
     public Container removeContainer(){
-        System.out.println(containers.size());
-
+        Container container = new Container(-1);
         if (containers.size() > 0) {
-            Container container = containers.get(containers.size() - 1) ;
+            try {
+                container = containers.get(containers.size() - 1) ;
+            
+            } catch (IndexOutOfBoundsException e) {
+                container = containers.get(containers.size() - 2) ;
+            }
 
             if (!container.reserved) {
                 container.reserved = true;
-    
-                System.out.println("SHIP: Unloading container number: " + container.volgNummer);
-                containers.remove(containers.size() - 1);   
+                containers.remove(container);   
+                System.out.println("SHIP: Container: " + container.volgNummer + " gegeven.");
+
                 return container;
             }
         }
