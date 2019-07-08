@@ -1,28 +1,51 @@
+import java.util.*;
+
 public class Main{
-        
-        static Ship ship = new Ship();
-        static Dock dock = new Dock();
-        static Crane cr1 = new Crane("Kraan 1");
-        static Crane cr2 = new Crane("Kraan 2");
-        static Truck truck1 = new Truck("A");
-        static Truck truck2 = new Truck("B");
-        static Truck truck3 = new Truck("C");
+    private static int craneAmount = 2;
+    private static int truckAmount = 3;
+
+    private static Crane[] cranes;
+    private static Truck[] trucks;
+
+    public static Dock dock = new Dock();
+    public static Ship ship = new Ship();
 
     public static void main(String[] args) {
-        Thread tCrane1 = new Thread(cr1);
-        Thread tCrane2 = new Thread(cr2);
+        cranes = new Crane[craneAmount];
+        trucks = new Truck[truckAmount];
 
-        Thread tTruck1 = new Thread(truck1);
-        Thread tTruck2 = new Thread(truck2);
-        Thread tTruck3 = new Thread(truck3);
+        // create the cranes
+        for (int i = 0; i < craneAmount; i++) {
+            cranes[i] = new Crane("Kraan " + (i+1), ship, dock);
+            Thread tr = new Thread(cranes[i]);
+            tr.start();
+        }
 
-        ship.fillShip(100);
+        // create the trucks
+        for (int i = 0; i < truckAmount; i++) { 
+            trucks[i] =  new Truck("Truck " + (i+1), dock);
+            Thread tr = new Thread(trucks[i]);
+            tr.start();
+        }
 
-        tCrane1.start();
-        tCrane2.start();
+        ship.start();
+    }
 
-        tTruck1.start();
-        tTruck2.start();
-        tTruck3.start();
+    // notify the cranes when the ship has a container to offer
+    public static void notifyCrane(){
+        for (Crane c : cranes) {
+            synchronized(c) {
+                c.notify();
+            }
+        }
+    }
+
+    // notify all the trucks when the dock has some containers stored
+    public static void notifyTruck(){
+        for (Truck t : trucks) {
+            synchronized(t) {
+              t.notify();
+            }
+        }
     }
 }

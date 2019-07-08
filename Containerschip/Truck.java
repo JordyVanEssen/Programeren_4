@@ -1,13 +1,14 @@
 import java.util.Random;
 
 public class Truck extends Thread{
-    Dock dock = new Dock();
+    Dock dock;
     Random random = new Random();
     String naam;
+    Container container;
 
-    public Truck(String pNaam){
+    public Truck(String pNaam, Dock pDock){
         this.naam = pNaam;   
-        dock = Main.dock; 
+        this.dock = pDock;
     }
 
     @Override
@@ -17,26 +18,23 @@ public class Truck extends Thread{
         }
     }
 
-    public synchronized void getContainer(){
+    public void getContainer(){
         try {
-            Container container = new Container(-1);
+            System.out.println(this.naam + ": Wil container halen....");
 
-            System.out.println("TRUCK " + this.naam + ": Wil container halen....");
-
-            Thread.sleep(random.nextInt(1000) + 1000);
-
-            container = dock.releaseContainer();
-
-            if (container == null) {
-                getContainer();
+            this.container = dock.releaseContainer();
+    
+            if (this.container == null) {
+                synchronized (this){
+                    wait();
+                }
             }
 
-            System.out.println("TRUCK " + this.naam + ": Heeft container: " + container.volgNummer + " wegrijden...");
+            if (this.container != null) {
+                System.out.println("TRUCK " + this.naam + ": Heeft container " + this.container.volgNummer + " wegrijden...");
+                Thread.sleep(random.nextInt(5000) + 1000);
+            }
 
-            Thread.sleep(random.nextInt(1000) + 5000);
-
-        } catch (Exception e) {
-            //TODO: handle exception
-        }
+        } catch (Exception e) { }
     }
 }

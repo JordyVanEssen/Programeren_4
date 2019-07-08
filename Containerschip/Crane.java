@@ -1,15 +1,16 @@
 import java.util.Random;
 
-public class Crane extends Thread{
-    Ship ship = new Ship();
-    Dock dock = new Dock();
+public class Crane extends Thread {
     Random random = new Random();
+    Ship ship;
+    Dock dock;
     String naam;
+    private Container container;
 
-    public Crane(String pNaam){
+    public Crane(String pNaam, Ship pShip, Dock pDock) {
         this.naam = pNaam;
-        ship = Main.ship;
-        dock = Main.dock;
+        this.ship = pShip;
+        this.dock = pDock;
     }
 
     @Override
@@ -19,31 +20,38 @@ public class Crane extends Thread{
         }
     }
 
-    public synchronized void getContainer(){
+    public void getContainer() {
         System.out.println(this.naam.toUpperCase() + ": Wil container halen.");
 
-        try {
-            Thread.sleep(random.nextInt(5000) + 1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        // gets the container from the ship
+        this.container = this.ship.removeContainer();
+
+        // wait for a notification from the ship if there is a container available
+        if (this.container == null) {
+            try {
+                synchronized (this) {
+                    this.wait();
+                }
+            } catch (Exception e) {}
         }
 
-        Container container = ship.removeContainer();
+        if (this.container != null) {
+            try {
+                this.container.sem.acquire(); // get semaphore to reserve the container
+            } catch (Exception e) {
+            }
 
-        if (container == null) {
-            getContainer();
-        }
+            System.out.println(this.naam.toUpperCase() + ": Kreeg container: " + container.volgNummer);
 
-        System.out.println(this.naam.toUpperCase() + ": Kreeg container: " + container.volgNummer);
-        
-        container.reserved = false;
-        dumpContainer(container);
-    }
+            dock.storeContainer(this.container);
 
-    public synchronized void dumpContainer(Container pContainer){
-        boolean stored = false;
-        while (!stored) {
-            stored = dock.storeContainer(pContainer);
+            this.container.sem.release();
+
+            try {
+                Thread.sleep(random.nextInt(3000) + 1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
